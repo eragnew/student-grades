@@ -3,6 +3,14 @@
 <head>
   <meta charset="utf-8">
   <title></title>
+  <style type="text/css">
+    .pending {
+      background-color: gray;
+    }
+    .failed {
+      background-color: red;
+    }
+  </style>
 </head>
 <body data-ng-app="studentsApp">
   <main data-ng-controller="StudentsController" data-ng-init="getAll()">
@@ -25,7 +33,6 @@
           Name: {{student.name}}<br>
           Subject: {{student.subject}}<br>
           Grade: {{student.grade}}<br>
-          <!--<button data-ng-click="student.editing = true">Edit</button>-->
           <button data-ng-click="editStudent(student)">Edit</button>
           <button data-ng-click="removeStudent(student)">Delete</button>
         </span>
@@ -35,7 +42,6 @@
           <input type="text" data-ng-model="student.grade">
           <button type="submit">Save Changes</button>
         </form>
-        <!--<button data-ng-if="student.editing" data-ng-click="student.editing = false">Cancel</button>-->
         <button data-ng-if="student.editing" data-ng-click="resetStudent(student)">Cancel</button>
       </li>
     </ul>

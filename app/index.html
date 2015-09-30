@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title></title>
+</head>
+<body data-ng-app="studentsApp">
+  <main data-ng-controller="StudentsController" data-ng-init="getAll()">
+    <h1>Student Grades App</h1>
+    <form name="newStudentForm" data-ng-submit="createStudent(newStudent)">
+      <label for="name">Student Name:
+        <input type="text" required data-ng-model="newStudent.name">
+      </label>
+      <label for="subject">Subject:
+        <input type="text" required data-ng-model="newStudent.subject">
+      </label>
+      <label for="grade">Grade:
+        <input type="text" required data-ng-model="newStudent.grade">
+      </label>
+      <button type="submit" data-ng-disabled="newStudentForm.$invalid">Create Student</button>
+    </form>
+    <ul id="studentslist">
+      <li class="{{student.status}}" data-ng-repeat="student in students">
+        <span data-ng-if="!student.editing">
+          Name: {{student.name}}<br>
+          Subject: {{student.subject}}<br>
+          Grade: {{student.grade}}<br>
+          <!--<button data-ng-click="student.editing = true">Edit</button>-->
+          <button data-ng-click="editStudent(student)">Edit</button>
+          <button data-ng-click="removeStudent(student)">Delete</button>
+        </span>
+        <form data-ng-if="student.editing" name="{{'studentForm' + student._id}}" data-ng-submit="updateStudent(student)">
+          <input type="text" data-ng-model="student.name">
+          <input type="text" data-ng-model="student.subject">
+          <input type="text" data-ng-model="student.grade">
+          <button type="submit">Save Changes</button>
+        </form>
+        <!--<button data-ng-if="student.editing" data-ng-click="student.editing = false">Cancel</button>-->
+        <button data-ng-if="student.editing" data-ng-click="resetStudent(student)">Cancel</button>
+      </li>
+    </ul>
+  </main>
+  <script type="text/javascript" src="bundle.js"></script>
+</body>
+</html>

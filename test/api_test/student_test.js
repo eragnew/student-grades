@@ -3,11 +3,11 @@ var chaiHttp = require('chai-http');
 chai.use(chaiHttp);
 var expect = chai.expect;
 process.env.MONGO_URL = 'mongodb://localhost/students_test';
-require(__dirname + '/../server');
+require(process.env.PWD + '/server');
 var mongoose = require('mongoose');
 var url = 'localhost:3000/api';
-var Student = require(__dirname + '/../models/student');
-var User = require(__dirname + '/../models/user');
+var Student = require(process.env.PWD + '/models/student');
+var User = require(process.env.PWD + '/models/user');
 
 var token = '';
 

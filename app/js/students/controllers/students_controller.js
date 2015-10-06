@@ -1,48 +1,42 @@
 module.exports = function(app) {
-  app.controller('StudentsController', ['$scope', '$http', function($scope, $http) {
+  app.controller('StudentsController', ['$scope', 'Resource', function($scope, Resource) {
     $scope.students = [];
 
+    var studentResource = Resource('students');
+
     $scope.getAll = function() {
-      $http.get('/api/students')
-        .then(function(res) {
-          $scope.students = res.data;
-        }, function(res) {
-          console.log(res);
-        });
+      studentResource.getAll(function(err, data) {
+        if (err) return console.log(err);
+        $scope.students = data;
+        $scope.updateCount();
+      });
     };
 
     $scope.createStudent = function(student) {
-      $http.post('/api/students', student)
-        .then(function(res) {
-          $scope.students.push(res.data);
-          $scope.newStudent = null;
-        }, function(res) {
-          console.log(res);
-        });
+      studentResource.create(student, function(err, data) {
+        if (err) return console.log(err);
+        $scope.newStudent = null;
+        $scope.students.push(data);
+        $scope.updateCount();
+      });
     };
 
     $scope.updateStudent = function(student) {
       student.status = 'pending';
-      $http.put('/api/students/' + student._id, student)
-        .then(function(res) {
-          delete student.status;
-          student.editing = false;
-        }, function(res) {
-          console.log(res);
-          student.status = 'failed';
-          student.editing = false;
-        });
+      studentResource.update(student, function(err) {
+        delete student.status;
+        student.editing = false;
+        if (err) return console.log(err);
+      });
     };
 
     $scope.removeStudent = function(student) {
       student.status = 'pending';
-      $http.delete('/api/students/' + student._id)
-        .then(function(res) {
-          $scope.students.splice($scope.students.indexOf(student), 1);
-        }, function(res) {
-          $scope.getAll();
-          console.log(res);
-        });
+      studentResource.remove(student, function(err) {
+        if (err) return console.log(err);
+        $scope.students.splice($scope.students.indexOf(student), 1);
+        $scope.updateCount();
+      });
     };
 
     $scope.editStudent = function(student) {
@@ -58,6 +52,10 @@ module.exports = function(app) {
       student.grade = student.savedGrade;
       student.savedName = student.savedSubject = student.savedGrade = null;
       student.editing = false;
+    };
+
+    $scope.updateCount = function() {
+      $scope.count = $scope.students.length;
     };
   }]);
 };

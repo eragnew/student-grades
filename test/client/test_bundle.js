@@ -45,6 +45,7 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	__webpack_require__(1);
+	__webpack_require__(11);
 
 
 /***/ },
@@ -52,7 +53,7 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	__webpack_require__(2);
-	__webpack_require__(6);
+	__webpack_require__(10);
 
 	describe('students controller', function() {
 	  var $httpBackend;
@@ -169,7 +170,10 @@
 	__webpack_require__(3);
 
 	var studentsApp = angular.module('studentsApp', []);
+
 	__webpack_require__(4)(studentsApp);
+	__webpack_require__(6)(studentsApp);
+	__webpack_require__(8)(studentsApp);
 
 
 
@@ -29095,51 +29099,127 @@
 /* 5 */
 /***/ function(module, exports) {
 
+	var handleSuccess = function(callback) {
+	  return function(res) {
+	    callback(null, res.data);
+	  };
+	};
+
+	var handleError = function(callback) {
+	  return function(err) {
+	    callback(err);
+	  };
+	};
+
 	module.exports = function(app) {
-	  app.controller('StudentsController', ['$scope', '$http', function($scope, $http) {
+	  app.factory('Resource', ['$http', function($http) {
+	    var Resource = function(resourceName) {
+	      this.resourceName = resourceName;
+	    };
+
+	    Resource.prototype.create = function(resource, callback) {
+	      $http.post('/api/' + this.resourceName, resource)
+	        .then(handleSuccess(callback), handleError(callback));
+	    };
+
+	    Resource.prototype.getAll = function(callback) {
+	      $http.get('/api/' + this.resourceName)
+	        .then(handleSuccess(callback), handleError(callback));
+	    };
+
+	    Resource.prototype.update = function(resource, callback) {
+	      $http.put('/api/' + this.resourceName + '/' + resource._id, resource)
+	        .then(handleSuccess(callback), handleError(callback));
+	    };
+
+	    Resource.prototype.remove = function(resource, callback) {
+	      $http.delete('/api/' + this.resourceName + '/' + resource._id)
+	        .then(handleSuccess(callback), handleError(callback));
+	    };
+
+	    return function(resourceName) {
+	      return new Resource(resourceName);
+	    };
+	  }]);
+	};
+
+
+/***/ },
+/* 6 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = function(app) {
+	  __webpack_require__(7)(app);
+	};
+
+
+/***/ },
+/* 7 */
+/***/ function(module, exports) {
+
+	module.exports = function(app) {
+	  app.directive('studentCount', function() {
+	    return {
+	      restrict: 'A',
+	      replace: true,
+	      template: '<p>Student Count: {{count}}</p>'
+	    };
+	  });
+	};
+
+
+/***/ },
+/* 8 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = function(app) {
+	  __webpack_require__(9)(app);
+	};
+
+
+/***/ },
+/* 9 */
+/***/ function(module, exports) {
+
+	module.exports = function(app) {
+	  app.controller('StudentsController', ['$scope', 'Resource', function($scope, Resource) {
 	    $scope.students = [];
 
+	    var studentResource = Resource('students');
+
 	    $scope.getAll = function() {
-	      $http.get('/api/students')
-	        .then(function(res) {
-	          $scope.students = res.data;
-	        }, function(res) {
-	          console.log(res);
-	        });
+	      studentResource.getAll(function(err, data) {
+	        if (err) return console.log(err);
+	        $scope.students = data;
+	        $scope.updateCount();
+	      });
 	    };
 
 	    $scope.createStudent = function(student) {
-	      $http.post('/api/students', student)
-	        .then(function(res) {
-	          $scope.students.push(res.data);
-	          $scope.newStudent = null;
-	        }, function(res) {
-	          console.log(res);
-	        });
+	      studentResource.create(student, function(err, data) {
+	        if (err) return console.log(err);
+	        $scope.newStudent = null;
+	        $scope.students.push(data);
+	        $scope.updateCount();
+	      });
 	    };
 
 	    $scope.updateStudent = function(student) {
 	      student.status = 'pending';
-	      $http.put('/api/students/' + student._id, student)
-	        .then(function(res) {
-	          delete student.status;
-	          student.editing = false;
-	        }, function(res) {
-	          console.log(res);
-	          student.status = 'failed';
-	          student.editing = false;
-	        });
+	      studentResource.update(student, function(err) {
+	        delete student.status;
+	        student.editing = false;
+	        if (err) return console.log(err);
+	      });
 	    };
 
 	    $scope.removeStudent = function(student) {
 	      student.status = 'pending';
-	      $http.delete('/api/students/' + student._id)
-	        .then(function(res) {
-	          $scope.students.splice($scope.students.indexOf(student), 1);
-	        }, function(res) {
-	          $scope.getAll();
-	          console.log(res);
-	        });
+	      studentResource.remove(student, function(err) {
+	        if (err) return console.log(err);
+	        $scope.students.splice($scope.students.indexOf(student), 1);
+	        $scope.updateCount();
+	      });
 	    };
 
 	    $scope.editStudent = function(student) {
@@ -29156,12 +29236,16 @@
 	      student.savedName = student.savedSubject = student.savedGrade = null;
 	      student.editing = false;
 	    };
+
+	    $scope.updateCount = function() {
+	      $scope.count = $scope.students.length;
+	    };
 	  }]);
 	};
 
 
 /***/ },
-/* 6 */
+/* 10 */
 /***/ function(module, exports) {
 
 	/**
@@ -31634,6 +31718,95 @@
 
 
 	})(window, window.angular);
+
+
+/***/ },
+/* 11 */
+/***/ function(module, exports, __webpack_require__) {
+
+	__webpack_require__(2);
+
+	describe('rest service', function() {
+	  beforeEach(angular.mock.module('studentsApp'));
+
+	  var RestService;
+	  var $httpBackend;
+	  var studentsResource;
+	  beforeEach(angular.mock.inject(function(Resource, _$httpBackend_) {
+	    RestService = Resource;
+	    $httpBackend = _$httpBackend_;
+	    studentsResource = RestService('students');
+	  }));
+
+	  afterEach(function() {
+	    $httpBackend.verifyNoOutstandingExpectation();
+	    $httpBackend.verifyNoOutstandingRequest();
+	  });
+
+	  it('should make a get request', function() {
+	    $httpBackend.expectGET('/api/students').respond(200, [{
+	      _id: 123,
+	      name: 'Joe Sixpack',
+	      subject: 'Math',
+	      grade: 4
+	    }]);
+	    studentsResource.getAll(function(err, data) {
+	      expect(err).toBe(null);
+	      expect(Array.isArray(data)).toBe(true);
+	    });
+	    $httpBackend.flush();
+	  });
+
+	  it('should make a post request', function() {
+	    var mockStudent = {
+	      name: 'Joe Sixpack',
+	      subject: 'Math',
+	      grade: 4
+	    };
+	    $httpBackend.expectPOST('/api/students', mockStudent).respond(200, {
+	      _id: 123,
+	      name: 'Joe Sixpack',
+	      subject: 'Math',
+	      grade: 4
+	    });
+	    studentsResource.create(mockStudent, function(err, data) {
+	      expect(err).toBe(null);
+	      expect(data._id).toBe(123);
+	      expect(data.name).toBe('Joe Sixpack');
+	      expect(data.subject).toBe('Math');
+	      expect(data.grade).toBe(4);
+	    });
+	    $httpBackend.flush();
+	  });
+
+	  it('should make a put request', function() {
+	    var mockStudent = {
+	      _id: 123,
+	      name: 'Jane Eightpack',
+	      subject: 'Art',
+	      grade: 2
+	    };
+	    $httpBackend.expectPUT('/api/students/123', mockStudent).respond(200);
+	    studentsResource.update(mockStudent, function(err) {
+	      expect(err).toBe(null);
+	    });
+	    $httpBackend.flush();
+	  });
+
+	  it('should make a delete request', function() {
+	    var mockStudent = {
+	      _id: 123,
+	      name: 'Frank',
+	      subject: 'English',
+	      grade: 2.5
+	    };
+	    $httpBackend.expectDELETE('/api/students/123').respond(200);
+	    studentsResource.remove(mockStudent, function(err) {
+	      expect(err).toBe(null);
+	    });
+	    $httpBackend.flush();
+	  });
+	});
 
 
 /***/ }

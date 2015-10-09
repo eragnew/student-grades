@@ -9,12 +9,6 @@
           <button data-ng-click="editStudent(student)">Edit</button>
           <button data-ng-click="removeStudent(student)">Delete</button>
         </span>
-<!--         <form data-ng-if="student.editing" name="{{'studentForm' + student._id}}" data-ng-submit="updateStudent(student)">
-          <input type="text" data-ng-model="student.name">
-          <input type="text" data-ng-model="student.subject">
-          <input type="text" data-ng-model="student.grade">
-          <button type="submit">Save Changes</button>
-        </form> -->
         <div data-student-form data-ng-if="student.editing" data-button-text="Save Changes" data-student="student" data-save="updateStudent(student)"></div>
         <button data-ng-if="student.editing" data-ng-click="resetStudent(student)">Cancel</button>
       </li>

@@ -63,5 +63,9 @@ module.exports = function(app) {
     $scope.updateCount = function() {
       $scope.count = $scope.students.length;
     };
+
+    $scope.gradeInBounds = function(student) {
+       return (student.grade >= 0 && student.grade <=4);
+    };
   }]);
 };

@@ -9,4 +9,5 @@
     <input type="text" required data-ng-model="student.grade">
   </label>
   <button type="submit" data-ng-disabled="newStudentForm.$invalid">{{buttonText}}</button>
+  <p data-ng-if="!gradeInBounds(student)">Grade must be between 0 and 4.</p>
 </form>

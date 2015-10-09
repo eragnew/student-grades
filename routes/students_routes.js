@@ -6,22 +6,23 @@ var eatAuth = require(__dirname + '/../lib/eat_auth');
 
 var studentsRoute = module.exports = exports = express.Router();
 
-studentsRoute.get('/students', function(req, res) {
-  Student.find({}, function(err, data) {
+studentsRoute.get('/students', jsonParser, eatAuth, function(req, res) {
+  Student.find({author: req.user.username}, function(err, data) {
     if (err) return handleError(err, res);
     res.json(data);
   });
 });
 
-studentsRoute.post('/students', jsonParser, function(req, res) {
+studentsRoute.post('/students', jsonParser, eatAuth, function(req, res) {
   var newStudent = new Student(req.body);
+  newStudent.author = req.user.username;
   newStudent.save(function(err, data) {
     if (err) return handleError(err, res);
     res.json(data);
   });
 });
 
-studentsRoute.put('/students/:id', jsonParser, function(req, res) {
+studentsRoute.put('/students/:id', jsonParser, eatAuth, function(req, res) {
   var newStudentBody = req.body;
   delete newStudentBody._id;
   Student.update({_id: req.params.id}, newStudentBody, function(err, data) {
@@ -30,14 +31,14 @@ studentsRoute.put('/students/:id', jsonParser, function(req, res) {
   });
 });
 
-studentsRoute.delete('/students/:id', function(req, res) {
+studentsRoute.delete('/students/:id', jsonParser, eatAuth, function(req, res) {
   Student.remove({_id: req.params.id}, function(err) {
     if (err) return handleError(err, res);
     res.json({msg: 'success'});
   });
 });
 
-studentsRoute.get('/subjects', function(req, res) {
+studentsRoute.get('/subjects', jsonParser, eatAuth, function(req, res) {
   Student.find().distinct('subject', function(err, data) {
     if (err) return handleError(err, res);
     res.json(data);

@@ -1,8 +1,14 @@
 module.exports = function(app) {
-  app.controller('StudentsController', ['$scope', 'Resource', function($scope, Resource) {
-    $scope.students = [];
+  app.controller('StudentsController', ['$scope', 'Resource', '$http', '$location', '$cookies', function($scope, Resource, $http, $location, $cookies) {
 
+    var eat = $cookies.get('eat');
+    if (!(eat && eat.length))
+      $location.path('/signup');
+
+    $http.defaults.headers.common.token = eat;
+    $scope.students = [];
     var studentResource = Resource('students');
+    $scope.newStudent = {};
 
     $scope.getAll = function() {
       studentResource.getAll(function(err, data) {
@@ -15,7 +21,7 @@ module.exports = function(app) {
     $scope.createStudent = function(student) {
       studentResource.create(student, function(err, data) {
         if (err) return console.log(err);
-        $scope.newStudent = null;
+        $scope.newStudent = {};
         $scope.students.push(data);
         $scope.updateCount();
       });

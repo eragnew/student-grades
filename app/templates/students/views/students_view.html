@@ -1,0 +1,23 @@
+<section data-ng-controller="StudentsController" data-ng-init="getAll()">
+    <div data-student-form data-save="createStudent(student)" data-student="newStudent" data-button-text="New Student"></div>
+    <ul id="studentslist">
+      <li class="{{student.status}}" data-ng-repeat="student in students">
+        <span data-ng-if="!student.editing">
+          Name: {{student.name}}<br>
+          Subject: {{student.subject}}<br>
+          Grade: {{student.grade}}<br>
+          <button data-ng-click="editStudent(student)">Edit</button>
+          <button data-ng-click="removeStudent(student)">Delete</button>
+        </span>
+<!--         <form data-ng-if="student.editing" name="{{'studentForm' + student._id}}" data-ng-submit="updateStudent(student)">
+          <input type="text" data-ng-model="student.name">
+          <input type="text" data-ng-model="student.subject">
+          <input type="text" data-ng-model="student.grade">
+          <button type="submit">Save Changes</button>
+        </form> -->
+        <div data-student-form data-ng-if="student.editing" data-button-text="Save Changes" data-student="student" data-save="updateStudent(student)"></div>
+        <button data-ng-if="student.editing" data-ng-click="resetStudent(student)">Cancel</button>
+      </li>
+    </ul>
+    <div data-student-count data-count="count"></div>
+</section>

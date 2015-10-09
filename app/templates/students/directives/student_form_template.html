@@ -1,0 +1,12 @@
+<form name="newStudentForm" data-ng-submit="save({student: student})">
+  <label for="name">Student Name:
+    <input type="text" required data-ng-model="student.name">
+  </label>
+  <label for="subject">Subject:
+    <input type="text" required data-ng-model="student.subject">
+  </label>
+  <label for="grade">Grade:
+    <input type="text" required data-ng-model="student.grade">
+  </label>
+  <button type="submit" data-ng-disabled="newStudentForm.$invalid">{{buttonText}}</button>
+</form>

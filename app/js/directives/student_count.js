@@ -3,7 +3,7 @@ module.exports = function(app) {
     return {
       restrict: 'A',
       replace: true,
-      template: '<p>Student Count: {{count}}</p>'
+      templateUrl: '/templates/directives/student_count_template.html'
     };
   });
 };

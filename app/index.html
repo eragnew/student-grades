@@ -11,12 +11,17 @@
     .failed {
       background-color: red;
     }
+    body {
+      padding-top: 50px;
+    }
   </style>
 </head>
 <body data-ng-app="studentsApp">
-  <p data-ng-if="loggedIn()">{{username}} currently logged in. | <a href data-ng-click="logOut()">Log Out</a></p>
-  <h1>Student Grades App</h1>
-  <main data-ng-view></main>
+  <div class="container">
+    <p data-ng-if="loggedIn()">{{username}} currently logged in. | <a href data-ng-click="logOut()">Log Out</a></p>
+    <h1>Student Grades App</h1>
+    <main data-ng-view></main>
+  </div>
   <script type="text/javascript" src="bundle.js"></script>
 </body>
 </html>
